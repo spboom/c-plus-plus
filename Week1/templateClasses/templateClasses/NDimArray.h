@@ -1,11 +1,11 @@
 #pragma once
-template <typename T, value int N>
+template <typename T, int N>
 class NDimarray
 {
 public:
 	T* _array;
 	int* dimSize;
-	int lenght;
+	int length;
 	NDimarray()
 	{
 		int* size = new int[2];
@@ -33,7 +33,7 @@ public:
 		copy(other);
 	}
 
-	NDimarray<T>& operator =(const NDimarray& other)
+	NDimarray<T, N>& operator =(const NDimarray& other)
 	{
 		if (this != &other)
 		{
@@ -50,7 +50,7 @@ public:
 		move.clean();
 	}
 
-	NDimarray<T>& operator=(NDimarray&& move)
+	NDimarray<T, N>& operator=(NDimarray&& move)
 	{
 		if (this != &move)
 		{
@@ -86,27 +86,31 @@ public:
 
 			ofset *= dimSize[i];
 		}
-		return location
+		return location;
 	}
 
-	int get_dim_size(int dim){ return dimSize[dim]; };
+	int get_dim_size(int dim){
+		if (dim >= N)
+		{
+			throw exception("out of bounds exception");
+			return -1;
+		}
+		return dimSize[dim];
+	};
 
 	~NDimarray(){ clean(); }
 private:
 	void clean()
 	{
 		delete[] _array;
-		xSize = 0;
-		ySize = 0;
-		zSize = 0;
+		delete[] dimSize;
+		length = 0;
 	}
 
 	void set(const NDimarray& value)
 	{
 		_array = value._array;
-		xSize = value.xSize;
-		ySize = value.ySize;
-		zSize = value.zSize;
+		dimSize = value.dimSize;
 	}
 
 	void copy(const NDimarray& value)
@@ -118,6 +122,17 @@ private:
 		{
 			_array[i] = value._array[i];
 		}
+
+		dimSize = new int[value.getDimAmount()];
+		for (int i = 0; i < value.getDimAmount; i++)
+		{
+			dimSize[i] = value.dimSize[i];
+		}
+	}
+
+	int getDimAmount()
+	{
+		return N;
 	}
 };
 
